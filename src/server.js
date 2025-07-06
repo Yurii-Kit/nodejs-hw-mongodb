@@ -29,7 +29,7 @@ export const setupServer = () => {
   });
   app.get('/contacts', async (req, res) => {
     const contacts = await getAllContacts();
-    console.log('Contacts from DB:', contacts); // Додаємо лог
+    // console.log('Contacts from DB:', contacts); // Додаємо лог
     res.status(200).json({
       status: 200,
       message: 'Successfully found contacts!',

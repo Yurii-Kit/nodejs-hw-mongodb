@@ -4,7 +4,12 @@ import cors from 'cors';
 
 import { getEnvVar } from './utils/getEnvVar.js';
 
-import contactsRouter from './routers/contacts.js'; // Імпортуємо роутер
+// Імпортуємо роутер
+import contactsRouter from './routers/contacts.js';
+
+// Імпортуємо middleware
+import { errorHandler } from './middlewares/errorHendler.js';
+import { notFoundHandler } from './middlewares/notFoundHandler.js';
 
 // Читаємо змінну оточення PORT
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -31,12 +36,9 @@ export const setupServer = () => {
 
   app.use(contactsRouter); // Додаємо роутер до app як middleware
 
-  app.use((err, req, res, next) => {
-    res.status(500).json({
-      message: 'Something went wrong',
-      error: err.message,
-    });
-  });
+  app.use(notFoundHandler); // Middleware для обробки 404 помилок
+
+  app.use(errorHandler); // Middleware для обробки помилок
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

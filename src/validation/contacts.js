@@ -7,16 +7,13 @@ export const createContactSchema = Joi.object({
     .required(),
   email: Joi.string().email().required(),
   contactType: Joi.string().valid('personal', 'home', 'work').required(),
-
   isFavourite: Joi.boolean(),
 });
 
 export const updateContactSchema = Joi.object({
   name: Joi.string().min(3).max(20),
   phoneNumber: Joi.string().pattern(/^\+380\d{9}$/),
-
-  email: Joi.string().email(),
+  email: Joi.string().email().allow('', null),
   contactType: Joi.string().valid('personal', 'home', 'work'),
-
   isFavourite: Joi.boolean(),
 });

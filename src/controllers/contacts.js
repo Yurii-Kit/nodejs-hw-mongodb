@@ -67,6 +67,7 @@ export const createContactsController = async (req, res) => {
   });
 };
 
+// Контролер для видалення контакту
 export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const contact = await getContactById(contactId);
@@ -83,6 +84,7 @@ export const deleteContactController = async (req, res, next) => {
   res.status(204).send();
 };
 
+// Контролер для оновлення контакту
 export const updateContactController = async (req, res, next) => {
   const { contactId } = req.params;
   const contact = await getContactById(contactId);

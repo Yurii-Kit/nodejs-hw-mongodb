@@ -35,12 +35,19 @@ export const getContactsController = async (req, res) => {
 
 export const getContactByIdController = async (req, res) => {
   // console.log(req.user);
+
   const { contactId } = req.params;
   const contact = await getContactById(contactId);
 
   // Створюємо та налаштовуємо помилку
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
+  }
+  // Перевіряємо, чи контакт належить користувачу
+  if (!contact.ownerId.equals(req.user.id)) {
+    throw createHttpError.Forbidden(
+      'You do not have permission to access this contact',
+    );
   }
 
   // Відповідь, якщо контакт знайдено
@@ -62,28 +69,37 @@ export const createContactsController = async (req, res) => {
 
 export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
-  const student = await deleteContact(contactId);
+  const contact = await getContactById(contactId);
 
-  if (!student) {
-    next(createHttpError(404, 'Contact not found'));
-    return;
+  if (!contact) {
+    return next(createHttpError(404, 'Contact not found'));
   }
 
+  if (!contact.ownerId.equals(req.user.id)) {
+    return next(createHttpError.Forbidden('Access denied: not contact owner'));
+  }
+
+  await deleteContact(contactId);
   res.status(204).send();
 };
 
 export const updateContactController = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await updateContact(contactId, req.body);
+  const contact = await getContactById(contactId);
 
   if (!contact) {
-    next(createHttpError(404, 'Contact not found'));
-    return;
+    return next(createHttpError(404, 'Contact not found'));
   }
+
+  if (!contact.ownerId.equals(req.user.id)) {
+    return next(createHttpError.Forbidden('Access denied: not contact owner'));
+  }
+
+  const updatedContact = await updateContact(contactId, req.body);
 
   res.json({
     status: 200,
     message: 'Successfully patched a contact!',
-    data: contact,
+    data: updatedContact,
   });
 };

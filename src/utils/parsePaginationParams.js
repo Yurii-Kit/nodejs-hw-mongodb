@@ -1,15 +1,15 @@
 // src/utils/parsePaginationParams.js
 
-const parseNumber = (number, defaultValue) => {
-  const isString = typeof number === 'string';
+const parseNumber = (value, defaultValue) => {
+  const isString = typeof value === 'string';
   if (!isString) return defaultValue;
 
-  const parsedNumber = parseInt(number);
-  if (Number.isNaN(parsedNumber)) {
+  const parsedValue = parseInt(value);
+  if (Number.isNaN(parsedValue)) {
     return defaultValue;
   }
 
-  return parsedNumber;
+  return parsedValue;
 };
 
 export const parsePaginationParams = (query) => {

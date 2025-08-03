@@ -1,0 +1,31 @@
+import createHttpError from 'http-errors';
+import { SessionsCollection } from '../db/models/session.js';
+import { UsersCollection } from '../db/models/user.js';
+
+export const authenticate = async (req, res, next) => {
+  const { authorization } = req.headers;
+  if (typeof authorization !== 'string') {
+    throw new createHttpError.Unauthorized('Please provide access token');
+  }
+
+  const [bearer, accessToken] = authorization.split(' ', 2);
+  if (bearer !== 'Bearer' || !accessToken) {
+    throw new createHttpError.Unauthorized('Please provide access token');
+  }
+  const session = await SessionsCollection.findOne({ accessToken });
+  if (!session) {
+    throw new createHttpError.Unauthorized('Session not found');
+  }
+
+  if (session.accessTokenValidUntil < new Date()) {
+    throw new createHttpError.Unauthorized('Access token expired');
+  }
+
+  const user = await UsersCollection.findById(session.userId);
+  if (!user) {
+    throw new createHttpError.Unauthorized('User not found');
+  }
+  req.user = { id: user._id, name: user.name };
+
+  next();
+};

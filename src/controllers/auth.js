@@ -38,7 +38,7 @@ export const loginUserController = async (req, res) => {
     httpOnly: true,
     expire: session.accessTokenValidUntil,
   });
-  // setupSession(res, session);
+
   res.json({
     status: 200,
     message: 'User login successfully!',

@@ -24,6 +24,7 @@ export const getContactsController = async (req, res) => {
     sortBy,
     sortOrder,
     filter,
+    ownerId: req.user.id,
   });
   res.status(200).json({
     status: 200,
@@ -33,6 +34,7 @@ export const getContactsController = async (req, res) => {
 };
 
 export const getContactByIdController = async (req, res) => {
+  // console.log(req.user);
   const { contactId } = req.params;
   const contact = await getContactById(contactId);
 
@@ -50,10 +52,10 @@ export const getContactByIdController = async (req, res) => {
 };
 
 export const createContactsController = async (req, res) => {
-  const contact = await createContact(req.body);
+  const contact = await createContact({ ...req.body, ownerId: req.user.id });
   res.status(201).json({
     status: 201,
-    message: `Successfully created a student!`,
+    message: `Successfully created a contact!`,
     data: contact,
   });
 };

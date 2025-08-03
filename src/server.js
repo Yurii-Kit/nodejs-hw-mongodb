@@ -12,6 +12,7 @@ import authRouter from './routers/auth.js';
 // Імпортуємо middleware
 import { errorHandler } from './middlewares/errorHendler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { authenticate } from './middlewares/authenticate.js';
 
 // Читаємо змінну оточення PORT
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -40,7 +41,7 @@ export const setupServer = () => {
   });
 
   app.use('/auth', authRouter); // Додаємо роутер до app як middleware
-  app.use('/contacts', contactsRouter); // Додаємо роутер до app як middleware
+  app.use('/contacts', authenticate, contactsRouter); // Додаємо роутер до app як middleware
 
   app.use(notFoundHandler); // Middleware для обробки 404 помилок
 

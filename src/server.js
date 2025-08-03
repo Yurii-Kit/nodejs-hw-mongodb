@@ -6,6 +6,7 @@ import { getEnvVar } from './utils/getEnvVar.js';
 
 // Імпортуємо роутер
 import contactsRouter from './routers/contacts.js';
+import authRouter from './routers/auth.js';
 
 // Імпортуємо middleware
 import { errorHandler } from './middlewares/errorHendler.js';
@@ -28,13 +29,14 @@ export const setupServer = () => {
     }),
   );
 
-  app.get('/', (req, res) => {
-    res.json({
-      message: 'Hello world!',
-    });
-  });
+  // app.get('/', (req, res) => {
+  //   res.json({
+  //     message: 'Hello world!',
+  //   });
+  // });
 
-  app.use(contactsRouter); // Додаємо роутер до app як middleware
+  app.use('/auth', authRouter); // Додаємо роутер до app як middleware
+  app.use('/contacts', contactsRouter); // Додаємо роутер до app як middleware
 
   app.use(notFoundHandler); // Middleware для обробки 404 помилок
 

@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import pino from 'pino-http';
 import cors from 'cors';
 
@@ -17,7 +18,10 @@ const PORT = Number(getEnvVar('PORT', '3000'));
 
 export const setupServer = () => {
   const app = express();
+
   app.use(express.json());
+
+  app.use(cookieParser());
 
   app.use(cors());
 
@@ -29,11 +33,11 @@ export const setupServer = () => {
     }),
   );
 
-  // app.get('/', (req, res) => {
-  //   res.json({
-  //     message: 'Hello world!',
-  //   });
-  // });
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Hello world!',
+    });
+  });
 
   app.use('/auth', authRouter); // Додаємо роутер до app як middleware
   app.use('/contacts', contactsRouter); // Додаємо роутер до app як middleware

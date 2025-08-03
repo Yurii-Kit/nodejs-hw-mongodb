@@ -1,12 +1,12 @@
 // import { THIRTY_DAYS } from '../constants/index.js';
 import {
   loginUser,
-  // logoutUser,
-  // refreshUsersSession,
+  logoutUser,
+  refreshUsersSession,
   registerUser,
 } from '../services/auth.js';
 
-// const setupSession = (res, session) => {
+// const setupSession = (res, session) => { на видалення!!!!!!!!!!!!!!
 //   res.cookie('refreshToken', session.refreshToken, {
 //     httpOnly: true,
 //     expires: new Date(Date.now() + THIRTY_DAYS),
@@ -30,6 +30,14 @@ export const registerUserController = async (req, res) => {
 export const loginUserController = async (req, res) => {
   const session = await loginUser(req.body);
 
+  res.cookie('sessionId', session._id, {
+    httpOnly: true,
+    expire: session.accessTokenValidUntil,
+  });
+  res.cookie('refreshToken', session.refreshToken, {
+    httpOnly: true,
+    expire: session.accessTokenValidUntil,
+  });
   // setupSession(res, session);
   res.json({
     status: 200,
@@ -40,30 +48,35 @@ export const loginUserController = async (req, res) => {
   });
 };
 
-// export const logoutUserController = async (req, res) => {
-//   if (req.cookies.sessionId) {
-//     await logoutUser(req.cookies.sessionId);
-//   }
+export const logoutUserController = async (req, res) => {
+  const { sessionId } = req.cookies;
+  if (sessionId !== undefined) {
+    await logoutUser(sessionId);
+  }
+  res.clearCookie('sessionId');
+  res.clearCookie('refreshToken');
+  res.status(204).end();
+};
 
-//   res.clearCookie('sessionId');
-//   res.clearCookie('refreshToken');
+export const refreshUserController = async (req, res) => {
+  const { sessionId, refreshToken } = req.cookies;
 
-//   res.status(204).send();
-// };
+  const session = await refreshUsersSession(sessionId, refreshToken);
 
-// export const refreshUserSessionController = async (req, res) => {
-//   const session = await refreshUsersSession({
-//     sessionId: req.cookies.sessionId,
-//     refreshToken: req.cookies.refreshToken,
-//   });
+  res.cookie('sessionId', session._id, {
+    httpOnly: true,
+    expire: session.accessTokenValidUntil,
+  });
+  res.cookie('refreshToken', session.refreshToken, {
+    httpOnly: true,
+    expire: session.accessTokenValidUntil,
+  });
 
-//   setupSession(res, session);
-
-//   res.json({
-//     status: 200,
-//     message: 'Successfully refreshed a session!',
-//     data: {
-//       accessToken: session.accessToken,
-//     },
-//   });
-// };
+  res.json({
+    status: 200,
+    message: 'Session refreshed successfully!',
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
+};

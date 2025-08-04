@@ -25,7 +25,7 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    ownerId: {
+    userId: {
       type: Schema.Types.ObjectId,
       required: true,
     },

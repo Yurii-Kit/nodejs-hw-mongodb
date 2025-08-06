@@ -1,22 +1,17 @@
-// src/utils/getEnvVar.js
-
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-export function getEnvVar(name, defaultValue) {
-  const value = process.env[name];
+export function getEnvVar(key) {
+  if (!key) {
+    throw new Error('Environment variable key is required');
+  }
 
-  if (value) return value;
+  const value = process.env[key];
 
-  if (defaultValue) return defaultValue;
+  if (typeof value === 'undefined') {
+    throw new Error(`Environment variable "${key}" is not defined`);
+  }
 
-  throw new Error(`Missing: process.env['${name}'].`);
+  return value;
 }
-
-//Використати її ми можемо, наприклад,
-// в такому вигляді: env('PORT', '3000');
-//Якщо змінної оточення з такою назвою
-// не було вказано і не було передано дефолтного значення,
-// то виклик цієї функції викине помилку
-// з повідомленням Missing: process.env['PORT'].

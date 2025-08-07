@@ -80,42 +80,81 @@ export const refreshUsersSession = async ({ sessionId, refreshToken }) => {
   });
 };
 
+// export const requestResetToken = async (email) => {
+//   const user = await Users.findOne({ email });
+//   if (!user) throw createHttpError(404, 'User not found');
+
+//   const resetToken = jwt.sign(
+//     {
+//       sub: user._id,
+//       email,
+//     },
+//     getEnvVar('JWT_SECRET'),
+//     {
+//       expiresIn: '15m',
+//     },
+//   );
+
+//   const resetPasswordTemplatePath = path.join(
+//     TEMPLATES_DIR,
+//     'reset-password-email.html',
+//   );
+
+//   const templateSource = (
+//     await fs.readFile(resetPasswordTemplatePath)
+//   ).toString();
+
+//   const template = handlebars.compile(templateSource);
+//   const html = template({
+//     name: user.name,
+//     link: `${getEnvVar('APP_DOMAIN')}/auth/reset-password?token=${resetToken}`,
+//   });
+
+//   await sendEmail({
+//     from: getEnvVar(SMTP.SMTP_FROM),
+//     to: email,
+//     subject: 'Reset your password',
+//     html,
+//   });
+// };
+
 export const requestResetToken = async (email) => {
-  const user = await Users.findOne({ email });
-  if (!user) throw createHttpError(404, 'User not found');
+  try {
+    const user = await Users.findOne({ email });
+    if (!user) throw createHttpError(404, 'User not found');
 
-  const resetToken = jwt.sign(
-    {
-      sub: user._id,
-      email,
-    },
-    getEnvVar('JWT_SECRET'),
-    {
-      expiresIn: '15m',
-    },
-  );
+    const resetToken = jwt.sign(
+      { sub: user._id, email },
+      getEnvVar('JWT_SECRET'),
+      { expiresIn: '15m' },
+    );
 
-  const resetPasswordTemplatePath = path.join(
-    TEMPLATES_DIR,
-    'reset-password-email.html',
-  );
+    const resetPasswordTemplatePath = path.join(
+      TEMPLATES_DIR,
+      'reset-password-email.html',
+    );
 
-  const templateSource = (
-    await fs.readFile(resetPasswordTemplatePath)
-  ).toString();
+    const templateSource = (
+      await fs.readFile(resetPasswordTemplatePath)
+    ).toString();
+    const template = handlebars.compile(templateSource);
+    const html = template({
+      name: user.name,
+      link: `${getEnvVar(
+        'APP_DOMAIN',
+      )}/auth/reset-password?token=${resetToken}`,
+    });
 
-  const template = handlebars.compile(templateSource);
-  const html = template({
-    name: user.name,
-    link: `${getEnvVar('APP_DOMAIN')}/auth/reset-password?token=${resetToken}`,
-  });
-
-  await sendEmail({
-    from: getEnvVar(SMTP.SMTP_FROM),
-    to: email,
-    subject: 'Reset your password',
-    html,
-  });
+    await sendEmail({
+      from: getEnvVar(SMTP.SMTP_FROM),
+      to: email,
+      subject: 'Reset your password',
+      html,
+    });
+  } catch (error) {
+    console.error('❌ requestResetToken error:', error); // 👈 це покаже справжню причину
+    throw createHttpError(500, 'Internal Server Error');
+  }
 };
 
 export const resetPassword = async (payload) => {

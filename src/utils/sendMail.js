@@ -6,12 +6,21 @@ import { getEnvVar } from './getEnvVar.js';
 const transporter = nodemailer.createTransport({
   host: getEnvVar(SMTP.SMTP_HOST),
   port: Number(getEnvVar(SMTP.SMTP_PORT)),
+  secure: false, // true for 465, false for other ports
   auth: {
     user: getEnvVar(SMTP.SMTP_USER),
     pass: getEnvVar(SMTP.SMTP_PASSWORD),
   },
 });
 
+// export const sendEmail = async (options) => {
+//   return await transporter.sendMail(options);
+// };
 export const sendEmail = async (options) => {
-  return await transporter.sendMail(options);
+  try {
+    return await transporter.sendMail(options);
+  } catch (error) {
+    console.error('Email sending failed:', error); // 👈 покаже причину
+    throw error;
+  }
 };

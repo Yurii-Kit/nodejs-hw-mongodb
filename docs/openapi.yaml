@@ -12,7 +12,7 @@ tags:
     description: Operations related to contacts.
 servers:
   - url: http://127.0.0.1:3000
-  # - url: #посилання на задеплоєний сайт
+  - url: https://nodejs-hw-mongodb-wmcu.onrender.com
 paths:
   # тут будуть посилання на ендпоінти
   /contacts/{contactId}:
